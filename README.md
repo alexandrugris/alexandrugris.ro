@@ -17,7 +17,7 @@ Then open <http://localhost:8000>.
 ## Structure
 
 - `index.html` — complete site and styles
-- `assets/hero-city-park.png` — homepage hero photograph
+- `assets/hero-city-park.webp` — homepage hero photograph
 - `assets/portrait.png` — portrait reused from the existing site
 
 ## Next steps
