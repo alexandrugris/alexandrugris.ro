@@ -19,6 +19,7 @@ Then open <http://localhost:8000>.
 - `index.html` — complete site and styles
 - `assets/hero-city-park.webp` — homepage hero photograph
 - `assets/portrait.png` — portrait reused from the existing site
+- `assets/alexandru-gris-curriculum-vitae.pdf` — curriculum vitae, linked from the About section
 
 ## Next steps
 

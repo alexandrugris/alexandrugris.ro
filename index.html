@@ -56,6 +56,11 @@
     .article a:hover { color: var(--burgundy); text-decoration-color: currentColor; }
     .about { display: grid; grid-template-columns: .8fr 1.2fr; gap: 52px; background: #f7f4ed; border-top: 1px solid var(--rule); }
     .about p { max-width: 700px; margin: 0; color: #595c55; font-size: 18px; line-height: 1.6; }
+    .cv-link { display: inline-flex; flex-direction: column; gap: 6px; margin-top: 30px; padding: 16px 22px 17px; border: 1px solid var(--rule); border-left: 3px solid var(--burgundy); background: var(--paper); text-decoration: none; }
+    .cv-link:hover { border-color: var(--burgundy); border-left-color: var(--burgundy); }
+    .cv-link:hover .cv-link-title { color: var(--burgundy); }
+    .cv-link-title { font-size: 21px; letter-spacing: -.02em; }
+    .cv-link-meta { color: #85857c; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
     .footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px; padding: 23px max(7%, calc((100% - 1180px)/2)); color: #73756e; background: #efebe2; border-top: 1px solid var(--rule); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 11px; }
     .footer a { text-decoration: none; }
     .footer a:hover { color: var(--burgundy); }
@@ -133,7 +138,13 @@
     </section>
     <section class="section about" id="about">
       <h2>About</h2>
-      <p>I have spent my career building software, products, and teams across countries and industries. This is where I keep the ideas that survive the work: technical experiments, leadership lessons, unfinished questions, and occasional reflections on being human.</p>
+      <div>
+        <p>I have spent my career building software, products, and teams across countries and industries. This is where I keep the ideas that survive the work: technical experiments, leadership lessons, unfinished questions, and occasional reflections on being human.</p>
+        <a class="cv-link" href="assets/alexandru-gris-curriculum-vitae.pdf" download>
+          <span class="cv-link-title">Curriculum vitae</span>
+          <span class="cv-link-meta">PDF download · 3 pages</span>
+        </a>
+      </div>
     </section>
   </main>
   <footer class="footer">
