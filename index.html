@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,15 +32,17 @@
     .nav-trigger { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: #62645f; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
     .nav-trigger:hover { color: var(--burgundy); }
     .nav-caret { width: 5px; height: 5px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .18s ease; }
-    .nav-group[data-open="true"] .nav-caret, .nav-group:focus-within .nav-caret { transform: translateY(1px) rotate(225deg); }
-    .nav-submenu { position: absolute; z-index: 10; top: calc(100% + 12px); left: 50%; width: max-content; max-width: 290px; margin: 0; padding: 6px 0; list-style: none; background: var(--paper); border: 1px solid var(--rule); box-shadow: 0 16px 38px rgba(28,36,29,.15); opacity: 0; visibility: hidden; transform: translateX(-50%) translateY(-7px); transition: opacity .16s ease, transform .16s ease; }
+    .nav-group[data-open="true"] .nav-caret { transform: translateY(1px) rotate(225deg); }
+    html.no-js .nav-group:focus-within .nav-caret { transform: translateY(1px) rotate(225deg); }
+    .nav-submenu { position: absolute; z-index: 10; top: calc(100% + 12px); left: 50%; width: max-content; max-width: min(290px, calc(100vw - 32px)); margin: 0; padding: 6px 0; list-style: none; background: var(--paper); border: 1px solid var(--rule); box-shadow: 0 16px 38px rgba(28,36,29,.15); opacity: 0; visibility: hidden; transform: translateX(-50%) translateY(-7px); transition: opacity .16s ease, transform .16s ease; }
     .nav-submenu li + li { border-top: 1px solid #e7e3d9; }
     .nav-submenu a { display: block; padding: 11px 18px 12px; color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: 15px; letter-spacing: -.01em; line-height: 1.3; text-decoration: none; text-transform: none; }
     .nav-submenu a:hover, .nav-submenu a:focus-visible { color: var(--ink); background: #f4f1e9; }
     .submenu-label { display: block; color: var(--burgundy); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
     .submenu-title { display: block; margin-top: 6px; }
     .submenu-ext { margin-left: 6px; color: #a29d92; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 11px; }
-    .nav-group[data-open="true"] .nav-submenu, .nav-group:focus-within .nav-submenu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .nav-group[data-open="true"] .nav-submenu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    html.no-js .nav-group:focus-within .nav-submenu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
     @media (hover: hover) and (pointer: fine) { .nav-group:hover .nav-submenu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); } }
     .hero { position: relative; display: flex; align-items: flex-end; min-height: 620px; padding: 72px max(7%, calc((100% - 1180px)/2)); background: #cfd9cd url("assets/hero-city-park.webp") center/cover no-repeat; isolation: isolate; }
     .hero::before { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, rgba(21,31,25,.47), rgba(21,31,25,.08) 72%); }
@@ -89,12 +91,6 @@
       .section-head { align-items: flex-start; flex-direction: column; }
       .nav-group { width: 100%; }
       .nav-trigger { justify-content: center; }
-      .nav-submenu { position: static; display: none; width: auto; max-width: none; margin: 13px 0 0; padding: 0; border: 0; box-shadow: none; background: none; }
-      .nav-group .nav-submenu, .nav-group[data-open="true"] .nav-submenu, .nav-group:focus-within .nav-submenu { transform: none; }
-      .nav-group[data-open="true"] .nav-submenu, .nav-group:focus-within .nav-submenu { display: block; }
-      .nav-submenu li { border-top: 1px solid var(--rule); }
-      .nav-submenu li:first-child { border-top: 0; }
-      .nav-submenu a { padding: 10px 4px; text-align: center; }
     }
     @media (max-width: 440px) {
       .masthead { padding-inline: 4%; }
@@ -111,9 +107,9 @@
   <header class="masthead">
     <a class="domain" href="#top">alexandrugris.ro</a>
     <nav class="nav" aria-label="Primary navigation">
-      <a href="#top">Home</a>
       <a href="#principles">Principles</a>
       <a href="#writing">Writing</a>
+      <a href="#about">About</a>
       <div class="nav-group">
         <button class="nav-trigger" type="button" aria-expanded="false" aria-haspopup="true">Media Projects <span class="nav-caret" aria-hidden="true"></span></button>
         <ul class="nav-submenu">
@@ -128,7 +124,6 @@
           </li>
         </ul>
       </div>
-      <a href="#about">About</a>
     </nav>
   </header>
   <main id="content">
@@ -190,6 +185,8 @@
   </footer>
   <script>
     (function () {
+      document.documentElement.classList.remove('no-js');
+
       var groups = [].slice.call(document.querySelectorAll('.nav-group'));
       var triggers = groups.map(function (group) { return group.querySelector('.nav-trigger'); });
 
@@ -204,11 +201,17 @@
       triggers.forEach(function (trigger, i) {
         trigger.addEventListener('click', function () {
           var open = groups[i].getAttribute('data-open') === 'true';
-          closeAll(groups[i]);
+          closeAll();
           if (!open) {
             groups[i].setAttribute('data-open', 'true');
             trigger.setAttribute('aria-expanded', 'true');
           }
+        });
+      });
+
+      groups.forEach(function (group) {
+        group.querySelector('.nav-submenu').addEventListener('click', function (event) {
+          if (event.target.closest('a')) closeAll();
         });
       });
 
