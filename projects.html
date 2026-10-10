@@ -8,6 +8,7 @@
   <style>
     :root {
       --paper: #fbfaf7;
+      --paper-warm: #f2eee4;
       --ink: #30332f;
       --muted: #686b64;
       --burgundy: #8d2829;
@@ -35,6 +36,9 @@
     .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
     .project { display: block; padding-top: 16px; border-top: 1px solid #bbb7ae; text-decoration: none; }
     .project:first-child { border-top: 3px solid var(--burgundy); }
+    .project-media { display: block; overflow: hidden; margin-bottom: 17px; background: var(--paper-warm); }
+    .project-media img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; transition: transform .45s ease; }
+    .project:hover .project-media img, .project:focus-visible .project-media img { transform: scale(1.04); }
     .project-label { color: var(--burgundy); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
     .project h2 { margin: 11px 0 10px; color: #32352f; font-size: 23px; font-weight: 400; line-height: 1.12; letter-spacing: -.025em; }
     .project p { margin: 0; color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; line-height: 1.55; }
@@ -62,7 +66,7 @@
       .masthead { padding-inline: 4%; }
       .nav { gap: 12px 15px; }
     }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .project-media img { transition: none; } }
   </style>
 </head>
 <body>
@@ -82,16 +86,19 @@
       <p class="lede">Three pieces of longer work, each built as its own site and published on this domain. Each one opens in a new tab.</p>
       <div class="project-grid">
         <a class="project" href="https://alexandrugris.ro/from-the-edges/" target="_blank" rel="noopener noreferrer">
+          <span class="project-media"><img src="assets/project-from-the-edges.webp" width="1000" height="667" loading="lazy" decoding="async" alt="Colour lithograph of Calea Victoriei, Bucharest, in 1900, with the street's first buildings along a dirt road."></span>
           <span class="project-label">History</span>
           <h2>Europe, Seen from the Edge<span class="project-ext" aria-hidden="true">&#8599;</span></h2>
           <p>Europe needs a story to attach itself to. It is told here from the edge, through Romania, two centuries ago.<span class="visually-hidden"> (opens in a new tab)</span></p>
         </a>
         <a class="project" href="https://alexandrugris.ro/lightbringer/" target="_blank" rel="noopener noreferrer">
+          <span class="project-media"><img src="assets/project-lightbringer.webp" width="1000" height="667" loading="lazy" decoding="async" alt="Crayon illustration of a man standing on a rise with his face turned up to an open, star-flecked sky."></span>
           <span class="project-label">Poetry</span>
           <h2>The Light Bringer<span class="project-ext" aria-hidden="true">&#8599;</span></h2>
           <p>The Light Bringer and The Others: a diptych of poems, with the annotated reading alongside it.<span class="visually-hidden"> (opens in a new tab)</span></p>
         </a>
         <a class="project" href="https://alexandrugris.ro/literature/" target="_blank" rel="noopener noreferrer">
+          <span class="project-media"><img src="assets/project-literature.webp" width="1000" height="667" loading="lazy" decoding="async" alt="Charcoal drawing of people walking away down a rain-soaked street, one carrying an umbrella."></span>
           <span class="project-label">Fiction &amp; Poetry</span>
           <h2>Friday, Parallelism &amp; Torments<span class="project-ext" aria-hidden="true">&#8599;</span></h2>
           <p>Friday, Parallelism, and Torments: three illustrated works collected in one place.<span class="visually-hidden"> (opens in a new tab)</span></p>
