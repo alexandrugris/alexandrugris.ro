@@ -43,15 +43,16 @@ TS=$(date +%Y%m%d-%H%M%S)
 ssh website-root "cp -a /var/www/html /var/www/backup-$TS"
 
 cd "<repo>"
-rsync -avz index.html  website-root:/var/www/html/
-rsync -avz assets/     website-root:/var/www/html/assets/
+rsync -avz index.html    website-root:/var/www/html/
+rsync -avz projects.html website-root:/var/www/html/
+rsync -avz assets/       website-root:/var/www/html/assets/
 
 ssh website-root 'chown -R root:root /var/www/html && \
   find /var/www/html -type d -exec chmod 755 {} + && \
   find /var/www/html -type f -exec chmod 644 {} +'
 ```
 
-Deploy `index.html` and `assets/` only. **Never rsync with `--delete`**, and never
+Deploy `index.html`, `projects.html` and `assets/`. **Never rsync with `--delete`**, and never
 replace `/var/www/html` wholesale — the docroot also holds three separately deployed
 sub-sites, owned by their own repositories, that this repo does not contain:
 
@@ -61,8 +62,9 @@ sub-sites, owned by their own repositories, that this repo does not contain:
 | `/lightbringer/` | The Light Bringer diptych | `~/Downloads/lightbringer` |
 | `/literature/` | Friday, Parallelism & Torments | `~/Downloads/literary-sites/writings` |
 
-The front page links to all three from the **Media Projects** item in the primary nav.
-Touching those directories from here will overwrite work this repo has no copy of.
+The front page links to all three from the **Media Projects** item in the primary nav,
+which is a second page of this repo (`projects.html`), not a link out. Touching those
+directories from here will overwrite work this repo has no copy of.
 
 ### Two traps that will bite you
 
@@ -89,8 +91,13 @@ rename the file or accept the staleness. PDFs and `.webp` are not covered.
 
 ## Conventions
 
-- One page, one file. Markup, inline `<style>`, and content all live in `index.html`; there are no
-  partials and no build step to introduce one.
+- Two pages, no build step: `index.html` and `projects.html`. Each is self-contained —
+  markup, inline `<style>`, and content all in the file. There are no partials, no shared
+  stylesheet, and nothing to compile. The consequence is deliberate duplication of the
+  `:root` tokens and the masthead/nav/footer rules across both files; if the design
+  language changes, change it in both or the pages drift apart.
+- The pages link to each other by relative filename (`index.html`, `projects.html`), so
+  both must exist at the docroot root for navigation to work.
 - The design language: serif (Georgia) for body and headings, `Inter` with system fallbacks for
   small uppercase labels, burgundy `#8d2829` accents, `--paper #fbfaf7` background, hairline rules.
   Reuse the CSS custom properties in `:root` rather than hardcoding hex values.
