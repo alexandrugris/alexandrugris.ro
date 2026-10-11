@@ -95,15 +95,25 @@ the one that documents deployment. They all assume the repos live in `~/Download
 
 | Script | Run it | What it does |
 |---|---|---|
-| `tools/audit-deploy.py` | after any deploy | Byte-compares all 15 live pages to their repo file, then fetches every asset each page references. Exit 0 = clean. **This is the one that catches a bad server-config reload** — it reported the `index.html` redirect loop that `nginx -t` passed straight through. |
-| `tools/check-previews.py` | after changing any `<head>` | Reads `og:`/`twitter:` tags the way a scraper does, fetches `og:image`, checks the JPEG really is 1200×630 and inside platform limits. Takes URLs as arguments; needs no login and no third-party service. |
-| `tools/make-sitemap.py` | after deploying any page change | Regenerates `sitemap.xml` with `lastmod` taken from the git commit date of the file that renders each page. |
+| `tools/deploy.sh` | to deploy anything | **The one command.** Backs up the docroot, deploys all four sites, rebuilds `sitemap.xml`, then verifies. `--dry-run` touches nothing; `--no-backup` skips the backup. Does not commit or push — it reports dirty and unpushed repos instead. |
+| `tools/audit-deploy.py` | after any deploy | Byte-compares all 15 live pages to their repo file, then fetches every asset each page references. Exit 0 = clean. **This is the one that catches a bad server-config reload** — it reported the `index.html` redirect loop that `nginx -t` passed straight through. `deploy.sh` runs it for you. |
+| `tools/check-previews.py` | after changing any `<head>` | Reads `og:`/`twitter:` tags the way a scraper does, fetches `og:image`, checks the JPEG really is 1200×630 and inside platform limits. Takes URLs as arguments; needs no login and no third-party service. `deploy.sh` runs it for you. |
+| `tools/make-sitemap.py` | after deploying any page change | Regenerates `sitemap.xml` with `lastmod` taken from the git commit date of the file that renders each page. `deploy.sh` runs it for you, after the rsync so the dates describe what is actually live. |
 | `tools/server/nginx-default.conf` | — | Copy of the live vhost as last verified. Not deployed from here; see below. |
 
 **Re-run `make-sitemap.py` after any page change.** A `lastmod` that is out of date is worse
 than no `lastmod` at all — search engines use it to decide what to re-crawl, and a stale one
 teaches them to ignore your sitemap. It reads git dates from all four repos but writes here, so
 it must be committed and pushed in this repo.
+
+### Only `writings` has a build step
+
+`literary-sites/writings` is generated: its `build.py` starts with `shutil.rmtree(DIST)` and
+rebuilds `dist/` from `hub/` and `works/`. **Anything edited directly into that `dist/` is
+destroyed by the next build** — which is exactly how its four preview cards and every
+`og:`/canonical tag once came to be deleted without anyone noticing. `deploy.sh` runs its
+`build.py` for you; the other three repos have no build step, so their `dist/` is hand-edited
+and safe to edit directly.
 
 ### Cache caveat
 
