@@ -45,6 +45,8 @@ ssh website-root "cp -a /var/www/html /var/www/backup-$TS"
 cd "<repo>"
 rsync -avz index.html    website-root:/var/www/html/
 rsync -avz projects.html website-root:/var/www/html/
+rsync -avz robots.txt    website-root:/var/www/html/
+rsync -avz sitemap.xml   website-root:/var/www/html/
 rsync -avz assets/       website-root:/var/www/html/assets/
 
 ssh website-root 'chown -R root:root /var/www/html && \
@@ -52,9 +54,10 @@ ssh website-root 'chown -R root:root /var/www/html && \
   find /var/www/html -type f -exec chmod 644 {} +'
 ```
 
-Deploy `index.html`, `projects.html` and `assets/`. **Never rsync with `--delete`**, and never
-replace `/var/www/html` wholesale — the docroot also holds three separately deployed
-sub-sites, owned by their own repositories, that this repo does not contain:
+Deploy `index.html`, `projects.html`, `robots.txt`, `sitemap.xml` and `assets/`. The list is
+explicit by design: `tools/` and `.git/` must never reach the docroot. **Never rsync with
+`--delete`**, and never replace `/var/www/html` wholesale — the docroot also holds three
+separately deployed sub-sites, owned by their own repositories, that this repo does not contain:
 
 | Path | What it is | Source repo |
 |---|---|---|
@@ -82,6 +85,25 @@ Do not call a deploy done on the strength of rsync output. Check over HTTPS:
 - each asset returns 200 with the correct `content-type`
 - binary assets match by md5: `curl -s <url> -o /tmp/x && md5 -q /tmp/x`
 - the page renders with no failed requests (headless check, not just `curl`)
+
+## Tools
+
+`tools/` holds the estate's deploy and preview tooling. It is **never deployed** — the rsync
+list above is explicit and does not include it. These scripts cover all four sites, not just
+this one, which is why they live here: this is the root of the estate and its `AGENTS.md` is
+the one that documents deployment. They all assume the repos live in `~/Downloads/`.
+
+| Script | Run it | What it does |
+|---|---|---|
+| `tools/audit-deploy.py` | after any deploy | Byte-compares all 15 live pages to their repo file, then fetches every asset each page references. Exit 0 = clean. **This is the one that catches a bad server-config reload** — it reported the `index.html` redirect loop that `nginx -t` passed straight through. |
+| `tools/check-previews.py` | after changing any `<head>` | Reads `og:`/`twitter:` tags the way a scraper does, fetches `og:image`, checks the JPEG really is 1200×630 and inside platform limits. Takes URLs as arguments; needs no login and no third-party service. |
+| `tools/make-sitemap.py` | after deploying any page change | Regenerates `sitemap.xml` with `lastmod` taken from the git commit date of the file that renders each page. |
+| `tools/server/nginx-default.conf` | — | Copy of the live vhost as last verified. Not deployed from here; see below. |
+
+**Re-run `make-sitemap.py` after any page change.** A `lastmod` that is out of date is worse
+than no `lastmod` at all — search engines use it to decide what to re-crawl, and a stale one
+teaches them to ignore your sitemap. It reads git dates from all four repos but writes here, so
+it must be committed and pushed in this repo.
 
 ### Cache caveat
 
