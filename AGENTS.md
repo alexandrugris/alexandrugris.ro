@@ -85,9 +85,48 @@ Do not call a deploy done on the strength of rsync output. Check over HTTPS:
 
 ### Cache caveat
 
-The nginx vhost sends `Cache-Control: max-age=72576000` (84 days) for `.gif`, `.jpg` and `.png`.
+The nginx vhost sends `Cache-Control: max-age=7257600` (84 days) for `.gif`, `.jpg` and `.png`.
 Replacing `assets/portrait.png` under the same filename will **not** appear for returning visitors —
 rename the file or accept the staleness. PDFs and `.webp` are not covered.
+
+## nginx: server config lives on the box, not in git
+
+`/etc/nginx/sites-available/default` (symlinked into `sites-enabled/`) is **not** under version
+control. It is edited over SSH as root via the `website-root` alias. Back it up with
+`cp -a` before every change, validate with `nginx -t`, then `systemctl reload nginx` — never
+`restart`, which drops in-flight requests. A reload that takes the site down is recoverable in
+seconds from the `.bak-<timestamp>` file sitting next to it.
+
+One vhost serves `alexandrugris.ro`, `www.alexandrugris.ro` and `blog.alexandrugris.ro` from
+`/var/www/html`, which is why it looks like the blog is served from the docroot. It is not:
+`blog.alexandrugris.ro` is a CNAME to `ghs.google.com` and never reaches this box.
+
+### Canonicalisation rules added 2026-10-11
+
+`www.alexandrugris.ro` is a CNAME to the apex, so without a redirect both hostnames served a
+byte-identical copy of every page. Two rules now run in the TLS vhost, plus one in the port-80
+block:
+
+```nginx
+if ($request_uri ~ "^/index\.html(\?.*)?$")     { return 301 /$is_args$args; }
+if ($request_uri ~ "^/(.+/)index\.html(\?.*)?$") { return 301 /$1$is_args$args; }
+if ($host = www.alexandrugris.ro) { return 301 https://alexandrugris.ro$request_uri; }
+```
+
+**Match the directory-index rule on `$request_uri`, never `$uri`.** This is a real trap that
+broke the site once. `try_files $uri $uri/` satisfies a directory request by issuing an *internal*
+redirect to `/index.html`, and nginx re-runs location matching against it. A rule written against
+`$uri` therefore catches nginx's own internal hop and returns an **external 301 to the URL the
+client just requested** — so `/` 301s to `/`, `/literature/` 301s to `/literature/`, an infinite
+loop, and six pages stop serving. `$request_uri` holds the original client request and is not
+rewritten by internal redirects, which is why the rule must be written that way.
+
+### Verifying a server-config change
+
+`nginx -t` proves the syntax, not the behaviour. After any reload, immediately re-request the
+**directory** URLs (`/`, `/literature/`, `/lightbringer/`, `/from-the-edges/`,
+`/from-the-edges/annexes/`) and confirm `200`. A redirect rule that loops is invisible to
+`nginx -t` and takes the whole site down.
 
 ## Conventions
 
