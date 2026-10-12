@@ -3,13 +3,11 @@
 # Deploy all five alexandrugris.ro sites, regenerate the sitemap, verify.
 # The five are: the personal site root, europe-seen-from-the-edge (history),
 # the-light-bringer-diptych (poetry diptych), writings (literature hub) and
-# friday-bande-dessinee (bande dessinée of the Friday text). The friday-
-# bande-dessinee rsync destination is still TBD; until it is set, the
-# fifth-site hook in this script only registers the local repo, prints a
-# PENDING line in the deploy step, and includes it in the repo-state report
-# when the clone is present on this host. It is deliberately optional in
-# preflight so this script does not require FBD to exist before it can
-# deploy the other four.
+# friday-bande-dessinee (bande dessinée of the Friday text). The FBD sits
+# under /literature/friday-bd/ as a sibling of /literature/friday/ — both
+# of those pages describe the same source text, just rendered differently.
+# If FBD is missing on this host, deploy.sh still works for the other four;
+# FBD is treated like the rest of the deploy: build before rsync.
 #
 # Order matters: back up, deploy, regenerate lastmod from the git dates of
 # what was just deployed, then verify. Regenerating the sitemap after the
@@ -34,7 +32,7 @@ PERS="$HOME_DIR/Personal Website"
 EDGE="$HOME_DIR/europe-seen-from-the-edge"
 LB="$HOME_DIR/lightbringer"
 LIT="$HOME_DIR/literary-sites/writings"
-FBD="$HOME_DIR/friday-bande-dessinee"       # 5th site, deploy destination TBD
+FBD="$HOME_DIR/friday-bande-dessinee"       # 5th site, lives at /literature/friday-bd/
 
 DRY=""
 BACKUP=1
@@ -111,7 +109,7 @@ fi
 step "Deploy"
 # Each source gets its own explicit destination. Never --delete, never the
 # docroot as a whole: it holds four sub-sites this loop does not own
-# (history, lightbringer, literature, friday-bande-dessinee).
+# (history, lightbringer, literature-with-friday-bd-under-it, friday-bd).
 deploy() {
   local src=$1 dest=$2 label=$3
   printf '   %-14s -> %s\n' "$label" "$dest"
@@ -140,17 +138,19 @@ deploy "$EDGE/dist/"        "$DOCROOT/from-the-edges/"  "history"
 deploy "$LB/dist/"          "$DOCROOT/lightbringer/"    "lightbringer"
 deploy "$LIT/dist/"         "$DOCROOT/literature/"     "literature"
 
-# Friday (bande dessinée) — REGISTERED BUT NOT YET WIRED.
-# Until the rsync destination is decided, this block only prints a
-# placeholder and emits a warning. Nothing is uploaded to /var/www/html
-# for FBD, and audit-deploy.py does not check any FBD page. Replace
-# this block with `deploy "$FBD/dist/" "$DOCROOT/<chosen-path>/"
-# "friday-bd"` once the destination is set, and extend
-# tools/audit-deploy.py and tools/check-previews.py to cover the new
-# pages at the same time.
-if [ -d "$FBD" ]; then
-  printf '   %-14s -> %s\n' "friday-bd" "PENDING (destination not configured)"
-  warn "friday-bande-dessinee: rsync destination not configured — skipping"
+# Friday bande dessinée — sibling of /literature/friday/. Same pattern as
+# writings: build before deploy, dist/ is fully derived, anyone editing
+# dist/ directly loses their work on the next run.
+if [ -f "$FBD/build.py" ]; then
+  printf '   %-14s -> rebuild before deploy\n' "friday-bd"
+  ( cd "$FBD" && python3 build.py >/dev/null ) || die "build.py failed for the friday bande dessinée"
+  [ -n "$(git -C "$FBD" status --porcelain dist)" ] \
+    && warn "FBD build.py changed dist/ -- those changes are being deployed and must be committed"
+fi
+if [ -d "$FBD/dist" ]; then
+  deploy "$FBD/dist/"        "$DOCROOT/literature/friday-bd/"  "friday-bd"
+else
+  warn "friday-bande-dessinee/dist/ missing — the 5th-site deploy is being skipped"
 fi
 
 if [ -n "$DRY" ]; then

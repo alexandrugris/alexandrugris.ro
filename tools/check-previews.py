@@ -170,5 +170,6 @@ if __name__ == "__main__":
         "https://alexandrugris.ro/from-the-edges/",
         "https://alexandrugris.ro/lightbringer/",
         "https://alexandrugris.ro/literature/",
+        "https://alexandrugris.ro/literature/friday-bd/",
     ]
     sys.exit(main(sys.argv[1:] or default))
