@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 #
-# Deploy all four alexandrugris.ro sites, regenerate the sitemap, verify.
+# Deploy all five alexandrugris.ro sites, regenerate the sitemap, verify.
+# The five are: the personal site root, europe-seen-from-the-edge (history),
+# the-light-bringer-diptych (poetry diptych), writings (literature hub) and
+# friday-bande-dessinee (bande dessinée of the Friday text). The friday-
+# bande-dessinee rsync destination is still TBD; until it is set, the
+# fifth-site hook in this script only registers the local repo, prints a
+# PENDING line in the deploy step, and includes it in the repo-state report
+# when the clone is present on this host. It is deliberately optional in
+# preflight so this script does not require FBD to exist before it can
+# deploy the other four.
 #
 # Order matters: back up, deploy, regenerate lastmod from the git dates of
 # what was just deployed, then verify. Regenerating the sitemap after the
@@ -25,6 +34,7 @@ PERS="$HOME_DIR/Personal Website"
 EDGE="$HOME_DIR/europe-seen-from-the-edge"
 LB="$HOME_DIR/lightbringer"
 LIT="$HOME_DIR/literary-sites/writings"
+FBD="$HOME_DIR/friday-bande-dessinee"       # 5th site, deploy destination TBD
 
 DRY=""
 BACKUP=1
@@ -52,12 +62,25 @@ for d in "$PERS" "$EDGE" "$LB" "$LIT"; do
 done
 [ -x "$PERS/tools/audit-deploy.py" ] || [ -f "$PERS/tools/audit-deploy.py" ] \
   || die "missing $PERS/tools/audit-deploy.py — this script lives beside it"
-echo "   4 site repos present, audit tool present"
+
+# The 5th site (friday-bande-dessinee) is optional in preflight until its
+# rsync destination is wired up. The four deployed sites keep the
+# strict "die on missing" behaviour — only FBD is relaxed.
+if [ -d "$FBD" ]; then
+  echo "   5 site repos present, audit tool present"
+else
+  echo "   4 site repos present, audit tool present"
+  warn "friday-bande-dessinee not on this host yet — the 5th-site hook is dormant"
+fi
 
 DIRTY=()
 for d in "$PERS" "$EDGE" "$LB" "$LIT"; do
   [ -n "$(git -C "$d" status --porcelain)" ] && DIRTY+=("$(basename "$d")")
 done
+# Include FBD in the dirty report only when the clone exists here.
+if [ -d "$FBD" ]; then
+  [ -n "$(git -C "$FBD" status --porcelain)" ] && DIRTY+=("friday-bande-dessinee")
+fi
 if [ ${#DIRTY[@]} -gt 0 ]; then
   warn "uncommitted changes in: ${DIRTY[*]}"
   warn "the live site will not match git HEAD, so it is not restorable yet"
@@ -87,7 +110,8 @@ fi
 
 step "Deploy"
 # Each source gets its own explicit destination. Never --delete, never the
-# docroot as a whole: it holds three sub-sites this loop does not own.
+# docroot as a whole: it holds four sub-sites this loop does not own
+# (history, lightbringer, literature, friday-bande-dessinee).
 deploy() {
   local src=$1 dest=$2 label=$3
   printf '   %-14s -> %s\n' "$label" "$dest"
@@ -115,6 +139,19 @@ fi
 deploy "$EDGE/dist/"        "$DOCROOT/from-the-edges/"  "history"
 deploy "$LB/dist/"          "$DOCROOT/lightbringer/"    "lightbringer"
 deploy "$LIT/dist/"         "$DOCROOT/literature/"     "literature"
+
+# Friday (bande dessinée) — REGISTERED BUT NOT YET WIRED.
+# Until the rsync destination is decided, this block only prints a
+# placeholder and emits a warning. Nothing is uploaded to /var/www/html
+# for FBD, and audit-deploy.py does not check any FBD page. Replace
+# this block with `deploy "$FBD/dist/" "$DOCROOT/<chosen-path>/"
+# "friday-bd"` once the destination is set, and extend
+# tools/audit-deploy.py and tools/check-previews.py to cover the new
+# pages at the same time.
+if [ -d "$FBD" ]; then
+  printf '   %-14s -> %s\n' "friday-bd" "PENDING (destination not configured)"
+  warn "friday-bande-dessinee: rsync destination not configured — skipping"
+fi
 
 if [ -n "$DRY" ]; then
   step "Dry run — stopping before sitemap and verification"
@@ -157,6 +194,16 @@ for d in "$PERS" "$EDGE" "$LB" "$LIT"; do
   dirty="clean";      [ "$n" -ne 0 ] && dirty="$n file(s) dirty"
   printf '   %-14s %-8s %-8s %s\n' "$(basename "$d")" "$b" "$sync" "$dirty"
 done
+# FBD is reported only when its clone is on this host; same fields.
+if [ -d "$FBD" ]; then
+  b=$(git -C "$FBD" rev-parse --abbrev-ref HEAD)
+  local_sha=$(git -C "$FBD" rev-parse HEAD)
+  remote_sha=$(git -C "$FBD" ls-remote origin "$b" 2>/dev/null | cut -f1)
+  n=$(git -C "$FBD" status --porcelain | wc -l | tr -d ' ')
+  sync="in-sync"; [ "$local_sha" != "$remote_sha" ] && sync="UNPUSHED"
+  dirty="clean";      [ "$n" -ne 0 ] && dirty="$n file(s) dirty"
+  printf '   %-14s %-8s %-8s %s\n' "friday-bd" "$b" "$sync" "$dirty"
+fi
 
 step "Preview check"
 python3 "$PERS/tools/check-previews.py" \
