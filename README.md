@@ -21,9 +21,24 @@ Then open <http://localhost:8000>.
 - `assets/portrait.png` — portrait reused from the existing site
 - `assets/alexandru-gris-curriculum-vitae.pdf` — curriculum vitae, linked from the About section
 
+## Estate
+
+This repo is one of five that publish to **alexandrugris.ro**, and it owns
+the deploy script (`tools/deploy.sh`) plus the audit, preview-check and
+sitemap tooling that the estate-wide deploy runs against every site. The
+estate map and the verified deploy procedure live in
+[AGENTS.md](AGENTS.md); this is the high-level picture.
+
+| Repo | Docroot path | Source on the live host |
+| --- | --- | --- |
+| `alexandrugris/alexandrugris.ro` (this) | `/` | `~/Downloads/Personal Website` |
+| `alexandrugris/europe-seen-from-the-edge` | `/from-the-edges/` | `~/Downloads/europe-seen-from-the-edge` |
+| `alexandrugris/the-light-bringer-diptych` | `/lightbringer/` | `~/Downloads/lightbringer` |
+| `alexandrugris/writings` | `/literature/` | `~/Downloads/literary-sites/writings` |
+| `alexandrugris/friday-bande-dessinee` | TBD | `~/Downloads/friday-bande-dessinee` |
+
 ## Next steps
 
 - Refine homepage copy and navigation
 - Decide how writing from the two existing archives should be consolidated
 - Add dedicated Principles, Writing, Work, and About pages if useful
-- Choose hosting and connect `alexandrugris.ro`
