@@ -37,7 +37,6 @@ PAGES = [
     ("/literature/friday-bd/",         FBD,  "dist/index.html",                "0.8"),
     ("/literature/parallelism/",       LIT,  "dist/parallelism/index.html",    "0.8"),
     ("/literature/torments/",          LIT,  "dist/torments/index.html",       "0.8"),
-    ("/literature/friday-bd/",         FBD,  "dist/index.html",                "0.8"),
 ]
 
 
@@ -61,6 +60,17 @@ for path, repo, rel, prio in PAGES:
         f"    <priority>{prio}</priority>\n"
         f"  </url>"
     )
+
+# A duplicated <loc> is a real defect that still validates as XML and still
+# deploys, so it has to be caught here rather than by a search engine.
+seen: set[str] = set()
+dupes: list[str] = []
+for path, _repo, _rel, _prio in PAGES:
+    if path in seen:
+        dupes.append(path)
+    seen.add(path)
+if dupes:
+    raise SystemExit(f"duplicate PAGES entries: {', '.join(dupes)}")
 
 xml = (
     '<?xml version="1.0" encoding="UTF-8"?>\n'
