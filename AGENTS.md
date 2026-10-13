@@ -63,7 +63,8 @@ separately deployed sub-sites, owned by their own repositories, that this repo d
 |---|---|---|
 | `/from-the-edges/` | Europe, Seen from the Edge (history) | `~/Downloads/europe-seen-from-the-edge` |
 | `/lightbringer/` | The Light Bringer diptych | `~/Downloads/lightbringer` |
-| `/literature/` | Friday, Parallelism & Torments | `~/Downloads/literary-sites/writings` |
+| `/literature/` | Friday, Parallelism & Torments | `~/Downloads/writings` |
+| `/literature/friday-bd/` | Friday as a bande dessinée (5th site, sibling of `/literature/friday/`) | `~/Downloads/friday-bande-dessinee` |
 
 The front page links to all three from the **Media Projects** item in the primary nav,
 which is a second page of this repo (`projects.html`), not a link out. Touching those
@@ -89,31 +90,32 @@ Do not call a deploy done on the strength of rsync output. Check over HTTPS:
 ## Tools
 
 `tools/` holds the estate's deploy and preview tooling. It is **never deployed** — the rsync
-list above is explicit and does not include it. These scripts cover all four sites, not just
+list above is explicit and does not include it. These scripts cover all five sites, not just
 this one, which is why they live here: this is the root of the estate and its `AGENTS.md` is
 the one that documents deployment. They all assume the repos live in `~/Downloads/`.
 
 | Script | Run it | What it does |
 |---|---|---|
-| `tools/deploy.sh` | to deploy anything | **The one command.** Backs up the docroot, deploys all four sites, rebuilds `sitemap.xml`, then verifies. `--dry-run` touches nothing; `--no-backup` skips the backup. Does not commit or push — it reports dirty and unpushed repos instead. |
-| `tools/audit-deploy.py` | after any deploy | Byte-compares all 15 live pages to their repo file, then fetches every asset each page references. Exit 0 = clean. **This is the one that catches a bad server-config reload** — it reported the `index.html` redirect loop that `nginx -t` passed straight through. `deploy.sh` runs it for you. |
+| `tools/deploy.sh` | to deploy anything | **The one command.** Backs up the docroot, deploys all five sites (including the FBD under `/literature/friday-bd/`), rebuilds `sitemap.xml`, then verifies. `--dry-run` touches nothing; `--no-backup` skips the backup. Does not commit or push — it reports dirty and unpushed repos instead. |
+| `tools/audit-deploy.py` | after any deploy | Byte-compares all 16 live pages to their repo file, then fetches every asset each page references. Exit 0 = clean. **This is the one that catches a bad server-config reload** — it reported the `index.html` redirect loop that `nginx -t` passed straight through. `deploy.sh` runs it for you. |
 | `tools/check-previews.py` | after changing any `<head>` | Reads `og:`/`twitter:` tags the way a scraper does, fetches `og:image`, checks the JPEG really is 1200×630 and inside platform limits. Takes URLs as arguments; needs no login and no third-party service. `deploy.sh` runs it for you. |
 | `tools/make-sitemap.py` | after deploying any page change | Regenerates `sitemap.xml` with `lastmod` taken from the git commit date of the file that renders each page. `deploy.sh` runs it for you, after the rsync so the dates describe what is actually live. |
 | `tools/server/nginx-default.conf` | — | Copy of the live vhost as last verified. Not deployed from here; see below. |
 
 **Re-run `make-sitemap.py` after any page change.** A `lastmod` that is out of date is worse
 than no `lastmod` at all — search engines use it to decide what to re-crawl, and a stale one
-teaches them to ignore your sitemap. It reads git dates from all four repos but writes here, so
+teaches them to ignore your sitemap. It reads git dates from all five repos but writes here, so
 it must be committed and pushed in this repo.
 
-### Only `writings` has a build step
+### Only `writings` and `friday-bande-dessinee` have a build step
 
-`literary-sites/writings` is generated: its `build.py` starts with `shutil.rmtree(DIST)` and
+`writings` is generated: its `build.py` starts with `shutil.rmtree(DIST)` and
 rebuilds `dist/` from `hub/` and `works/`. **Anything edited directly into that `dist/` is
 destroyed by the next build** — which is exactly how its four preview cards and every
 `og:`/canonical tag once came to be deleted without anyone noticing. `deploy.sh` runs its
-`build.py` for you; the other three repos have no build step, so their `dist/` is hand-edited
-and safe to edit directly.
+`build.py` for you. The FBD (`friday-bande-dessinee`) is also generated and follows the same
+"dist is wiped, not merged" convention; `deploy.sh` runs its `build.py` too. The other three
+repos have no build step, so their `dist/` is hand-edited and safe to edit directly.
 
 ### Cache caveat
 
