@@ -118,7 +118,7 @@ and safe to edit directly.
 ### Cache caveat
 
 The nginx vhost sends `Cache-Control: max-age=7257600` (84 days) for `.gif`, `.jpg` and `.png`.
-Replacing `assets/portrait.png` under the same filename will **not** appear for returning visitors —
+Replacing `assets/portrait.webp` under the same filename will **not** appear for returning visitors —
 rename the file or accept the staleness. PDFs and `.webp` are not covered.
 
 ## nginx: server config lives on the box, not in git

@@ -16,6 +16,7 @@ PERS = HOME / "Personal Website"
 EDGE = HOME / "europe-seen-from-the-edge"
 LB = HOME / "lightbringer"
 LIT = HOME / "literary-sites" / "writings"
+FBD = HOME / "friday-bande-dessinee"
 BASE = "https://alexandrugris.ro"
 
 # (live path, repo, file that renders it, priority)
@@ -33,6 +34,7 @@ PAGES = [
     ("/lightbringer/notes.html",       LB,   "dist/notes.html",                "0.7"),
     ("/literature/",                   LIT,  "dist/index.html",                "1.0"),
     ("/literature/friday/",            LIT,  "dist/friday/index.html",         "0.8"),
+    ("/literature/friday-bd/",         FBD,  "dist/index.html",                "0.8"),
     ("/literature/parallelism/",       LIT,  "dist/parallelism/index.html",    "0.8"),
     ("/literature/torments/",          LIT,  "dist/torments/index.html",       "0.8"),
 ]

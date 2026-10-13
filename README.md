@@ -18,7 +18,7 @@ Then open <http://localhost:8000>.
 
 - `index.html` — complete site and styles
 - `assets/hero-city-park.webp` — homepage hero photograph
-- `assets/portrait.png` — portrait reused from the existing site
+- `assets/portrait.webp` — portrait reused from the existing site
 - `assets/alexandru-gris-curriculum-vitae.pdf` — curriculum vitae, linked from the About section
 
 ## Estate
@@ -35,7 +35,7 @@ estate map and the verified deploy procedure live in
 | `alexandrugris/europe-seen-from-the-edge` | `/from-the-edges/` | `~/Downloads/europe-seen-from-the-edge` |
 | `alexandrugris/the-light-bringer-diptych` | `/lightbringer/` | `~/Downloads/lightbringer` |
 | `alexandrugris/writings` | `/literature/` | `~/Downloads/literary-sites/writings` |
-| `alexandrugris/friday-bande-dessinee` | TBD | `~/Downloads/friday-bande-dessinee` |
+| `alexandrugris/friday-bande-dessinee` | `/literature/friday-bd/` | `~/Downloads/friday-bande-dessinee` |
 
 ## Next steps
 
