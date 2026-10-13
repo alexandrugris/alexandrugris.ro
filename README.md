@@ -34,7 +34,7 @@ estate map and the verified deploy procedure live in
 | `alexandrugris/alexandrugris.ro` (this) | `/` | `~/Downloads/Personal Website` |
 | `alexandrugris/europe-seen-from-the-edge` | `/from-the-edges/` | `~/Downloads/europe-seen-from-the-edge` |
 | `alexandrugris/the-light-bringer-diptych` | `/lightbringer/` | `~/Downloads/lightbringer` |
-| `alexandrugris/writings` | `/literature/` | `~/Downloads/literary-sites/writings` |
+| `alexandrugris/writings` | `/literature/` | `~/Downloads/writings` |
 | `alexandrugris/friday-bande-dessinee` | `/literature/friday-bd/` | `~/Downloads/friday-bande-dessinee` |
 
 ## Next steps

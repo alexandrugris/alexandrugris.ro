@@ -31,7 +31,7 @@ HOME_DIR="$HOME/Downloads"
 PERS="$HOME_DIR/Personal Website"
 EDGE="$HOME_DIR/europe-seen-from-the-edge"
 LB="$HOME_DIR/lightbringer"
-LIT="$HOME_DIR/literary-sites/writings"
+LIT="$HOME_DIR/writings"
 FBD="$HOME_DIR/friday-bande-dessinee"       # 5th site, lives at /literature/friday-bd/
 
 DRY=""

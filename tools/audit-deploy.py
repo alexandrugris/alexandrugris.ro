@@ -21,7 +21,7 @@ HOME = Path.home() / "Downloads"
 PERS = HOME / "Personal Website"
 EDGE = HOME / "europe-seen-from-the-edge" / "dist"
 LB = HOME / "lightbringer" / "dist"
-LIT = HOME / "literary-sites" / "writings" / "dist"
+LIT = HOME / "writings" / "dist"
 FBD = HOME / "friday-bande-dessinee" / "dist"
 
 BASE = "https://alexandrugris.ro"
