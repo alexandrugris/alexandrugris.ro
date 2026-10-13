@@ -20,6 +20,16 @@ Then open <http://localhost:8000>.
 - `assets/hero-city-park.webp` — homepage hero photograph
 - `assets/portrait.webp` — portrait reused from the existing site
 - `assets/alexandru-gris-curriculum-vitae.pdf` — curriculum vitae, linked from the About section
+- `assets/favicon.svg` — scalable site icon; the burgundy/cream `AG` mark, simplified to a
+  single `A` below 48px because two serif letters do not resolve at tab size
+- `assets/favicon-{16x16,32x32,48x48}.png` — raster fallbacks for the same mark
+- `assets/apple-touch-icon.png` — 180×180 home-screen icon
+- `assets/icon-{192,512}.png` — PWA-sized marks
+- `favicon.ico` — 16+32+48 multi-size icon at the docroot root, for crawlers and browsers
+  that only probe that one path
+
+The icon set is shared: every page in the estate links it with absolute `/assets/...`
+paths, so the other four repos reference these files without carrying copies.
 
 ## Estate
 
