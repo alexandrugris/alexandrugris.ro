@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 #
+# AGENTS.md in this repo is the authoritative document for publishing
+# alexandrugris.ro. Read it first; it documents the SSH aliases, the rsync
+# traps and the verification procedure this script relies on.
+#
 # Deploy all five alexandrugris.ro sites, regenerate the sitemap, verify.
 # The five are: the personal site root, europe-seen-from-the-edge (history),
 # the-light-bringer-diptych (poetry diptych), writings (literature hub) and

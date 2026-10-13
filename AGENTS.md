@@ -2,6 +2,23 @@
 
 Personal site for Alexandru Gris — a responsive static site built with plain HTML and inline CSS. No build step, no package manager, no framework. `index.html` **is** the deliverable; there is nothing to compile.
 
+## This file is authoritative
+
+**This `AGENTS.md` is the authoritative document for publishing alexandrugris.ro and every
+site in the estate.** Read it before deploying anything, and prefer it over any other copy,
+note, recollection or summary of the publish procedure — including instructions carried in
+another agent's memory or another machine's checkout of this repo.
+
+If this file and the tooling ever disagree, **the tooling is what actually runs, and the
+disagreement is the bug.** An earlier version of this file documented the literature site
+at `~/Downloads/writings` while `deploy.sh`, `audit-deploy.py` and `make-sitemap.py` all
+still resolved `literary-sites/writings`; the doc was right and the scripts were wrong,
+which is exactly why they were all changed together. Verify a path against the scripts,
+fix whichever side is wrong, and correct this file in the same commit.
+
+Keep it that way: this file is versioned with the code, so it cannot drift from the
+scripts silently — but only if you read it rather than working from memory.
+
 ## Local preview
 
 ```bash
