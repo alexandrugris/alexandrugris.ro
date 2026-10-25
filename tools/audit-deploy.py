@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Full deploy audit for the five alexandrugris.ro sites.
+"""Full deploy audit for the six alexandrugris.ro sites.
 
 1. Byte-compare every live HTML page against the file in its git repo.
 2. Resolve every local asset each page references over HTTPS.
@@ -23,6 +23,7 @@ EDGE = HOME / "europe-seen-from-the-edge" / "dist"
 LB = HOME / "lightbringer" / "dist"
 LIT = HOME / "writings" / "dist"
 FBD = HOME / "friday-bande-dessinee" / "dist"
+OBO = HOME / "organization-beneath-the-organization" / "site" / "dist"
 
 BASE = "https://alexandrugris.ro"
 
@@ -44,6 +45,7 @@ PAGES = [
     ("/literature/friday-bd/", FBD / "index.html"),
     ("/literature/parallelism/", LIT / "parallelism" / "index.html"),
     ("/literature/torments/", LIT / "torments" / "index.html"),
+    ("/org-beneath-org/", OBO / "index.html"),
 ]
 
 ASSET_RE = re.compile(

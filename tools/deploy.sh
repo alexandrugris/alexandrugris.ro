@@ -4,14 +4,15 @@
 # alexandrugris.ro. Read it first; it documents the SSH aliases, the rsync
 # traps and the verification procedure this script relies on.
 #
-# Deploy all five alexandrugris.ro sites, regenerate the sitemap, verify.
-# The five are: the personal site root, europe-seen-from-the-edge (history),
-# the-light-bringer-diptych (poetry diptych), writings (literature hub) and
-# friday-bande-dessinee (bande dessinée of the Friday text). The FBD sits
-# under /literature/friday-bd/ as a sibling of /literature/friday/ — both
-# of those pages describe the same source text, just rendered differently.
-# If FBD is missing on this host, deploy.sh still works for the other four;
-# FBD is treated like the rest of the deploy: build before rsync.
+# Deploy all six alexandrugris.ro sites, regenerate the sitemap, verify.
+# The six are: the personal site root, europe-seen-from-the-edge (history),
+# the-light-bringer-diptych (poetry diptych), writings (literature hub),
+# friday-bande-dessinee (bande dessinée of the Friday text) and
+# organization-beneath-the-organization (illustrated essay reader). The FBD
+# sits under /literature/friday-bd/ as a sibling of /literature/friday/ —
+# both of those pages describe the same source text, just rendered
+# differently. If FBD is missing on this host, deploy.sh still works for the
+# other five; FBD is treated like the rest of the deploy: build before rsync.
 #
 # Order matters: back up, deploy, regenerate lastmod from the git dates of
 # what was just deployed, then verify. Regenerating the sitemap after the
@@ -37,6 +38,7 @@ EDGE="$HOME_DIR/europe-seen-from-the-edge"
 LB="$HOME_DIR/lightbringer"
 LIT="$HOME_DIR/writings"
 FBD="$HOME_DIR/friday-bande-dessinee"       # 5th site, lives at /literature/friday-bd/
+OBO="$HOME_DIR/organization-beneath-the-organization"   # 6th site, lives at /org-beneath-org/
 
 DRY=""
 BACKUP=1
@@ -59,24 +61,24 @@ die()  { printf '   \033[31mx\033[0m %s\n' "$*" >&2; exit 1; }
 # ---------------------------------------------------------------- preflight
 
 step "Preflight"
-for d in "$PERS" "$EDGE" "$LB" "$LIT"; do
+for d in "$PERS" "$EDGE" "$LB" "$LIT" "$OBO"; do
   [ -d "$d" ] || die "missing repo: $d"
 done
 [ -x "$PERS/tools/audit-deploy.py" ] || [ -f "$PERS/tools/audit-deploy.py" ] \
   || die "missing $PERS/tools/audit-deploy.py — this script lives beside it"
 
 # The 5th site (friday-bande-dessinee) is optional in preflight until its
-# rsync destination is wired up. The four deployed sites keep the
-# strict "die on missing" behaviour — only FBD is relaxed.
+# rsync destination is wired up. The other five keep the strict "die on
+# missing" behaviour — only FBD is relaxed.
 if [ -d "$FBD" ]; then
-  echo "   5 site repos present, audit tool present"
+  echo "   6 site repos present, audit tool present"
 else
-  echo "   4 site repos present, audit tool present"
+  echo "   5 site repos present, audit tool present"
   warn "friday-bande-dessinee not on this host yet — the 5th-site hook is dormant"
 fi
 
 DIRTY=()
-for d in "$PERS" "$EDGE" "$LB" "$LIT"; do
+for d in "$PERS" "$EDGE" "$LB" "$LIT" "$OBO"; do
   [ -n "$(git -C "$d" status --porcelain)" ] && DIRTY+=("$(basename "$d")")
 done
 # Include FBD in the dirty report only when the clone exists here.
@@ -112,7 +114,7 @@ fi
 
 step "Deploy"
 # Each source gets its own explicit destination. Never --delete, never the
-# docroot as a whole: it holds four sub-sites this loop does not own
+# docroot as a whole: it holds sub-sites this loop does not own as a whole
 # (history, lightbringer, literature-with-friday-bd-under-it, friday-bd).
 deploy() {
   local src=$1 dest=$2 label=$3
@@ -157,6 +159,24 @@ else
   warn "friday-bande-dessinee/dist/ missing — the 5th-site deploy is being skipped"
 fi
 
+# The organization-beneath-the-organization reader — 6th site. Its build
+# script is site/build_site.py and it writes site/dist/. Unlike writings and
+# the FBD it does NOT wipe dist/ first (it only rewrites index.html,
+# questions.json and the WebP illustrations), so the committed
+# site/dist/audio/literary.mp3 survives a rebuild. Build anyway, so the
+# deployed HTML always matches the committed source.
+if [ -f "$OBO/site/build_site.py" ]; then
+  printf '   %-14s -> rebuild before deploy\n' "org-beneath-org"
+  ( cd "$OBO" && python3 site/build_site.py >/dev/null ) || die "build_site.py failed for the organization reader"
+  [ -n "$(git -C "$OBO" status --porcelain site/dist)" ] \
+    && warn "build_site.py changed site/dist/ -- those changes are being deployed and must be committed"
+fi
+if [ -d "$OBO/site/dist" ]; then
+  deploy "$OBO/site/dist/"    "$DOCROOT/org-beneath-org/"    "org-beneath-org"
+else
+  die "organization-beneath-the-organization/site/dist/ missing — the 6th-site deploy cannot run"
+fi
+
 if [ -n "$DRY" ]; then
   step "Dry run — stopping before sitemap and verification"
   echo "   Nothing was changed. Re-run without --dry-run to deploy."
@@ -189,7 +209,7 @@ step "Verify"
 python3 "$PERS/tools/audit-deploy.py" || die "audit failed — the live site does not match the repos"
 
 step "Repo state"
-for d in "$PERS" "$EDGE" "$LB" "$LIT"; do
+for d in "$PERS" "$EDGE" "$LB" "$LIT" "$OBO"; do
   b=$(git -C "$d" rev-parse --abbrev-ref HEAD)
   local_sha=$(git -C "$d" rev-parse HEAD)
   remote_sha=$(git -C "$d" ls-remote origin "$b" 2>/dev/null | cut -f1)
@@ -219,6 +239,7 @@ python3 "$PERS/tools/check-previews.py" \
   "$BASE/lightbringer/" "$BASE/lightbringer/notes.html" \
   "$BASE/literature/" "$BASE/literature/friday/" \
   "$BASE/literature/parallelism/" "$BASE/literature/torments/" \
+  "$BASE/org-beneath-org/" \
   | tail -3
 
 printf '\n\033[1mDeploy complete and verified.\033[0m\n'

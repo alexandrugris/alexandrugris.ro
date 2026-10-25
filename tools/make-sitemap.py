@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Regenerate sitemap.xml for alexandrugris.ro from the five site repos.
+"""Regenerate sitemap.xml for alexandrugris.ro from the six site repos.
 
 lastmod comes from the git commit date of the file that produces each page,
 so it is accurate at generation time. Re-run after deploying a change to any
 page; the sitemap lives in the Personal Website repo but reads git dates from
-all five, so it must be regenerated, committed and pushed there.
+all six, so it must be regenerated, committed and pushed there.
 
     python3 make-sitemap.py
 """
@@ -17,6 +17,7 @@ EDGE = HOME / "europe-seen-from-the-edge"
 LB = HOME / "lightbringer"
 LIT = HOME / "writings"
 FBD = HOME / "friday-bande-dessinee"
+OBO = HOME / "organization-beneath-the-organization"
 BASE = "https://alexandrugris.ro"
 
 # (live path, repo, file that renders it, priority)
@@ -37,6 +38,7 @@ PAGES = [
     ("/literature/friday-bd/",         FBD,  "dist/index.html",                "0.8"),
     ("/literature/parallelism/",       LIT,  "dist/parallelism/index.html",    "0.8"),
     ("/literature/torments/",          LIT,  "dist/torments/index.html",       "0.8"),
+    ("/org-beneath-org/",              OBO,  "site/dist/index.html",           "1.0"),
 ]
 
 
